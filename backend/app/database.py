@@ -1,9 +1,11 @@
 from pymongo import MongoClient
+import os
 from pydantic import BaseModel
 from typing import List, Optional
 
-# Connect to local MongoDB
-client = MongoClient("mongodb://localhost:27017/")
+# Connect to MongoDB via Environment Variable (or fallback to local)
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+client = MongoClient(MONGO_URI)
 db = client["ai_recruiter_db"]
 
 # Collections
