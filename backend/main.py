@@ -57,24 +57,11 @@ def list_jobs():
 
 @app.post("/api/upload_resume")
 async def upload_resume(
-    job_id: str = Form(...),
+    job_description: str = Form(...),
     candidate_name: str = Form(...),
     file: UploadFile = File(...)
 ):
-    # Verify Job
-    try:
-        if job_id != "1": # Fallback for mock job id from frontend
-            job_record = jobs_collection.find_one({"_id": ObjectId(job_id)})
-        else:
-            job_record = jobs_collection.find_one() # grab any available job if ID equals 1 mock
-    except Exception:
-        job_record = None
-
-    if not job_record:
-        raise HTTPException(status_code=404, detail="Job not found")
-        
-    job_skills_required = job_record.get('skills', [])
-    job_description = job_record.get('description', "")
+    job_skills_required = extract_skills(job_description)
     
     # Save PDF
     file_path = os.path.join(UPLOAD_DIR, file.filename)
@@ -112,8 +99,10 @@ async def upload_resume(
         "name": candidate_name,
         "resume_text": parsed_text,
         "skills": candidate_skills,
-        "experience": eval_result["explainable_breakdown"]["experience"],
-        "education": eval_result["explainable_breakdown"]["education"],
+        "experience": eval_result["raw_breakdown"]["experience"],
+        "education": eval_result["raw_breakdown"]["education"],
+        "skill_match": eval_result["raw_breakdown"]["skill_match"],
+        "jd_match": eval_result["raw_breakdown"].get("jd_match", 0.0),
         "score": final_score,
         "missing_skills": eval_result["missing_skills"],
         "recommendation": eval_result["recommendation"],
@@ -125,7 +114,7 @@ async def upload_resume(
     # Insert Screening Result
     screening_collection.insert_one({
         "candidate_id": candidate_id_str,
-        "job_id": str(job_record["_id"]),
+        "job_id": "custom",
         "score": final_score,
         "status": status
     })
@@ -179,3 +168,19 @@ def cluster_candidates():
     """ Runs KMeans clustering based on resume texts """
     result = run_clustering(num_clusters=3)
     return result
+
+@app.delete("/api/candidates/clear")
+def clear_all_candidates():
+    try:
+        candidates_collection.delete_many({})
+        screening_collection.delete_many({})
+        for filename in os.listdir(UPLOAD_DIR):
+            file_path = os.path.join(UPLOAD_DIR, filename)
+            if os.path.isfile(file_path):
+                try:
+                    os.unlink(file_path)
+                except Exception:
+                    pass
+        return {"message": "All candidates and resumes cleared successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

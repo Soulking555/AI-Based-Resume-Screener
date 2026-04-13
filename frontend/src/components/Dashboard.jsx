@@ -29,6 +29,25 @@ function Dashboard({ onNavigate, onSelectCandidate }) {
       });
   }, []);
 
+  const handleClearData = async () => {
+    if (!window.confirm("Are you sure you want to clear all candidate data and resumes? This action cannot be undone.")) return;
+    
+    setLoading(true);
+    try {
+      const res = await fetch('http://localhost:8000/api/candidates/clear', { method: 'DELETE' });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        alert("Failed to clear data.");
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error clearing data.");
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
@@ -44,9 +63,14 @@ function Dashboard({ onNavigate, onSelectCandidate }) {
           <h1>Talent Command Center</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>AI-driven candidate matching and intelligence reports are ready for review.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => onNavigate('candidates')}>
-          Upload Resume
-        </button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button className="btn btn-glass" style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }} onClick={handleClearData}>
+            Clear All Data
+          </button>
+          <button className="btn btn-primary" onClick={() => onNavigate('candidates')}>
+            Upload Resume
+          </button>
+        </div>
       </div>
 
       <div className="stats-grid">

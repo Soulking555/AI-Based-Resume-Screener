@@ -33,36 +33,48 @@ function CandidateProfile({ candidate }) {
             
             <div style={{ marginBottom: '1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                <span>Skill Match (40% weight)</span>
-                <span>{candidate.skills.length * 10}%</span>
+                <span>Skill Requirements Match</span>
+                <span>{candidate.skill_match !== undefined ? candidate.skill_match : candidate.skills.length * 10}%</span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${Math.min(100, candidate.skills.length * 10)}%` }}></div>
+                <div className="progress-bar" style={{ width: `${candidate.skill_match !== undefined ? candidate.skill_match : Math.min(100, candidate.skills.length * 10)}%` }}></div>
+              </div>
+            </div>
+
+            {candidate.jd_match !== undefined && (
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                  <span>Semantic JD Context Match</span>
+                  <span>{candidate.jd_match}%</span>
+                </div>
+                <div className="progress-bar-container">
+                  <div className="progress-bar" style={{ width: `${candidate.jd_match}%` }}></div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                <span>Experience Match</span>
+                <span>{candidate.experience !== undefined ? candidate.experience : 0}%</span>
+              </div>
+              <div className="progress-bar-container">
+                <div className="progress-bar" style={{ width: `${candidate.experience !== undefined ? candidate.experience : 0}%` }}></div>
               </div>
             </div>
 
             <div style={{ marginBottom: '1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                <span>Experience (20% weight)</span>
-                <span>{candidate.experience * 100}%</span>
+                <span>Education Match</span>
+                <span>{candidate.education !== undefined ? candidate.education : 0}%</span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${candidate.experience * 100}%` }}></div>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                <span>Education (10% weight)</span>
-                <span>{candidate.education * 100}%</span>
-              </div>
-              <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${candidate.education * 100}%` }}></div>
+                <div className="progress-bar" style={{ width: `${candidate.education !== undefined ? candidate.education : 0}%` }}></div>
               </div>
             </div>
             
             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '1rem' }}>
-              Note: Similarity and Projects scores are aggregated into Final Score by matching engine.
+               Note: The Final Score aggregates these distinct AI evaluation vectors.
             </p>
           </div>
           

@@ -54,34 +54,18 @@ function CandidateList({ onSelectCandidate }) {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file || !candidateName) return;
+    if (!file || !candidateName || !jobDescription) {
+      alert("Please provide the candidate name, resume, and job description.");
+      return;
+    }
     
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("candidate_name", candidateName);
-    formData.append("job_id", jobId);
+    formData.append("job_description", jobDescription);
 
     try {
-      // Create a dummy job first if we don't have jobs
-      // We are just assuming job ID 1 works, or we can make a dummy job API call here.
-      // But for simplicity, we mock the job creation or assume backend has one.
-      const jobRes = await fetch('http://localhost:8000/api/jobs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: "Software Engineer",
-          description: jobDescription,
-          skills: ["python", "machine learning", "docker", "react"],
-          experience: 3.0,
-          education: "bachelor"
-        })
-      });
-      const jobData = await jobRes.json();
-      const currentJobId = jobData.id || jobId;
-      
-      formData.set("job_id", currentJobId);
-
       const res = await fetch('http://localhost:8000/api/upload_resume', {
         method: 'POST',
         body: formData
@@ -90,12 +74,14 @@ function CandidateList({ onSelectCandidate }) {
       if (res.ok) {
         setFile(null);
         setCandidateName('');
+        setJobDescription('');
         fetchCandidates();
       } else {
         alert("Error uploading resume. Check backend logs.");
       }
     } catch (err) {
       console.error(err);
+      alert("Error processing upload.");
     }
     setUploading(false);
   };
@@ -116,10 +102,11 @@ function CandidateList({ onSelectCandidate }) {
         </div>
         <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1 }}>
           <textarea 
-            placeholder="Paste Job Description here to get Semantic Matching (Optional)"
+            placeholder="Paste Job Description here (Required for targeted matching)"
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
             style={{ width: '100%', minHeight: '80px', padding: '1rem', borderRadius: 'var(--radius-sm)', resize: 'vertical' }}
+            required
           />
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <input 

@@ -126,6 +126,12 @@ def generate_explainable_score(
             "education": round(0.10 * education_score_raw * 100, 1),
             "projects": round(0.10 * projects_score_raw * 100, 1)
         },
+        "raw_breakdown": {
+            "skill_match": round(skill_score_raw * 100, 1),
+            "jd_match": round(jd_match_score_raw * 100, 1) if job_description else 0.0,
+            "experience": round(experience_score_raw * 100, 1),
+            "education": round(education_score_raw * 100, 1)
+        },
         "matched_skills": list(matched_skills),
         "missing_skills": missing_skills,
         "recommendation": "; ".join(recommendation)
