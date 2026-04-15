@@ -10,14 +10,20 @@ except Exception as e:
 # Predefined skill database
 PREDEFINED_SKILLS = [
     "python", "java", "c++", "c", "c#", "go", "ruby", "rust", "javascript", "typescript",
-    "react", "angular", "vue", "svelte", "node.js", "express", "nest.js",
-    "fastapi", "django", "flask", "spring boot", "asp.net",
+    "react", "angular", "vue", "svelte", "node.js", "express", "nest.js", "next.js", "nuxt",
+    "fastapi", "django", "flask", "spring boot", "asp.net", "laravel", "ruby on rails",
     "docker", "kubernetes", "jenkins", "gitlab ci", "github actions", "terraform", "ansible",
-    "aws", "gcp", "azure", "linux", "bash", "powershell",
-    "sql", "mysql", "postgresql", "mongodb", "redis", "cassandra", "elasticsearch",
+    "aws", "gcp", "azure", "linux", "bash", "powershell", "unix", "shell scripting",
+    "sql", "mysql", "postgresql", "mongodb", "redis", "cassandra", "elasticsearch", "dynamodb",
     "machine learning", "deep learning", "nlp", "computer vision", "tensorflow", "pytorch", 
-    "scikit-learn", "pandas", "numpy", "matplotlib", "seaborn",
-    "git", "agile", "scrum", "jira"
+    "scikit-learn", "pandas", "numpy", "matplotlib", "seaborn", "keras", "opencv",
+    "git", "agile", "scrum", "jira", "confluence", "trello",
+    "html", "css", "sass", "less", "tailwind", "bootstrap", "material ui",
+    "php", "swift", "kotlin", "objective-c", "dart", "flutter", "react native",
+    "graphql", "rest api", "soap", "grpc", "websockets", "microservices",
+    "hadoop", "spark", "kafka", "rabbitmq", "celery", "airflow",
+    "cybersecurity", "penetration testing", "cryptography", "blockchain", "solidity",
+    "figma", "ui/ux", "photoshop", "illustrator", "wireframing"
 ]
 
 def extract_skills(text: str) -> list:

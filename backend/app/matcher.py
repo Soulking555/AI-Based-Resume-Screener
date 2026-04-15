@@ -66,6 +66,23 @@ def generate_explainable_score(
     Final Score = 0.4 skill + 0.2 similarity + 0.2 experience + 0.1 education + 0.1 projects
     (If job_description is provided, redistributes to include 0.2 JD similarity)
     """
+    if not resume_text.strip():
+        # Fallback if PDF parsing totally fails (e.g. image-based PDF)
+        return {
+            "final_score": 0.0,
+            "explainable_breakdown": {
+                "skill_match": 0.0, "similarity": 0.0, "jd_match": 0.0,
+                "experience": 0.0, "education": 0.0, "projects": 0.0
+            },
+            "raw_breakdown": {
+                "skill_match": 0.0, "jd_match": 0.0,
+                "experience": 0.0, "education": 0.0
+            },
+            "matched_skills": [],
+            "missing_skills": job_skills,
+            "recommendation": "Fatal Error: The AI could not extract any text from the uploaded PDF format. It might be an image/scanned document. Please upload a machine-readable, true text PDF for accurate scoring."
+        }
+
     # 1. Skill Score (Direct Match Ratio)
     matched_skills = set(candidate_skills).intersection(set(job_skills))
     skill_score_raw = len(matched_skills) / len(job_skills) if job_skills else 1.0
@@ -107,14 +124,36 @@ def generate_explainable_score(
     # Identify gaps
     missing_skills = list(set(job_skills) - set(candidate_skills))
     
-    # Generate Recommendation Logic (Innovation 1 Preview)
+    # Generate Recommendation Logic (Innovation 1 Preview) -> Improved AI Suggestion Path
     recommendation = []
+    
+    # Advanced AI Context Map for missing skills
+    ai_context_map = {
+        "python": "Consider building backend REST APIs using FastAPI or scripting robust data pipelines.",
+        "machine learning": "Focus on supervised learning algorithms and complete a predictive modeling project on Kaggle.",
+        "react": "Build several functional components and master React Hooks (useEffect, useState) to bridge this frontend gap.",
+        "docker": "Try containerizing a simple application and writing a multi-stage Dockerfile.",
+        "kubernetes": "Start with understanding Pods/Services and basic microservice deployments using minikube.",
+        "aws": "Gain hands-on cloud experience by deploying a small decoupled project utilizing EC2 and S3 instances.",
+        "sql": "Practice complex JOIN operations, aggregations, and window functions on real-world relational datasets.",
+        "java": "Focus heavily on Object-Oriented paradigms (OOP) and the Spring Boot framework ecosystems.",
+        "fastapi": "Create an asynchronous REST API emphasizing OpenAPI specifications and Pydantic validation.",
+        "javascript": "Focus on ES6+ features, asynchronous closures, and mastering the browser event loop."
+    }
+    
     if missing_skills:
-        recommendation.append(f"Learn {', '.join(missing_skills[:3])}")
+        for skill in missing_skills[:3]:  # Generate actionable steps for the top 3 gaps
+            base = f"Upskill in '{skill.capitalize()}'"
+            if skill.lower() in ai_context_map:
+                recommendation.append(f"{base} — {ai_context_map[skill.lower()]}")
+            else:
+                recommendation.append(f"{base} — Review official documentation and complete a starter project to bridge this JD requirement.")
+                
     if experience_score_raw < 0.5:
-        recommendation.append("Highlight more years of experience or practical roles.")
+        recommendation.append("Experience Gap — Strategically highlight any freelance projects, open-source contributions, or practical roles to compensate.")
+        
     if not recommendation:
-        recommendation.append("Strong candidate. Ready for technical interview.")
+        recommendation.append("Excellent Alignment — The candidate demonstrates strong structural overlap with the Job Description.")
         
     return {
         "final_score": round(final_score * 100, 1),
@@ -134,5 +173,5 @@ def generate_explainable_score(
         },
         "matched_skills": list(matched_skills),
         "missing_skills": missing_skills,
-        "recommendation": "; ".join(recommendation)
+        "recommendation": "\n".join(recommendation)
     }

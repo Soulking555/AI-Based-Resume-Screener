@@ -104,6 +104,7 @@ async def upload_resume(
         "skill_match": eval_result["raw_breakdown"]["skill_match"],
         "jd_match": eval_result["raw_breakdown"].get("jd_match", 0.0),
         "score": final_score,
+        "matched_skills": eval_result.get("matched_skills", []),
         "missing_skills": eval_result["missing_skills"],
         "recommendation": eval_result["recommendation"],
         "date": date_str

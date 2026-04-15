@@ -22,7 +22,18 @@ function CandidateProfile({ candidate }) {
             
             <div className="recommendation-box">
               <strong>AI Recommendation:</strong><br/>
-              {candidate.recommendation}
+              <div style={{ marginTop: '0.75rem' }}>
+                {candidate.recommendation ? candidate.recommendation.split('\n').map((line, i) => (
+                  <div key={i} style={{ marginBottom: '0.4rem', lineHeight: '1.4' }}>
+                    {line.startsWith('Upskill') || line.startsWith('Experience Gap') || line.startsWith('Excellent') ? (
+                      <>
+                        <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>• </span>
+                        {line}
+                      </>
+                    ) : line}
+                  </div>
+                )) : null}
+              </div>
             </div>
           </div>
 
@@ -33,8 +44,13 @@ function CandidateProfile({ candidate }) {
             
             <div style={{ marginBottom: '1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                <span>Skill Requirements Match</span>
-                <span>{candidate.skill_match !== undefined ? candidate.skill_match : candidate.skills.length * 10}%</span>
+                <span>Job Description Skills Fulfilled</span>
+                <span>
+                  {candidate.matched_skills 
+                    ? `${candidate.matched_skills.length} of ${candidate.matched_skills.length + (candidate.missing_skills?.length || 0)} matched (${candidate.skill_match || 0}%)`
+                    : `${candidate.skill_match !== undefined ? candidate.skill_match : candidate.skills.length * 10}%`
+                  }
+                </span>
               </div>
               <div className="progress-bar-container">
                 <div className="progress-bar" style={{ width: `${candidate.skill_match !== undefined ? candidate.skill_match : Math.min(100, candidate.skills.length * 10)}%` }}></div>
@@ -91,7 +107,7 @@ function CandidateProfile({ candidate }) {
           </div>
 
           <div className="profile-card">
-            <h3 style={{ marginBottom: '1rem' }}>Skill Gaps</h3>
+            <h3 style={{ marginBottom: '1rem' }}>Missing Job Description Skills</h3>
             {candidate.missing_skills.length > 0 ? candidate.missing_skills.map(s => (
               <span key={s} className="skill-tag skill-missing">{s}</span>
             )) : <p style={{ color: 'var(--success)', fontSize: '0.875rem' }}>No major skill gaps detected!</p>}
